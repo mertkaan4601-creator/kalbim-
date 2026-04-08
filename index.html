@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Özür Dilerim</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:#000; overflow:hidden; height:100vh; font-family:Arial, sans-serif; color:#ff69b4; }
+    canvas { position:absolute; top:0; left:0; z-index:1; }
+
+    .content {
+      position:relative; z-index:2;
+      height:100vh;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      text-align:center;
+    }
+
+    .heart { font-size:170px; animation:pulse 1.6s infinite; display:none; margin:15px 0; }
+    @keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.18);} }
+
+    .countdown { font-size:110px; font-weight:bold; text-shadow:0 0 30px #ff1493; margin:25px 0; opacity:0; }
+    
+    .big-text, .long-text {
+      font-size:78px; font-weight:bold; text-shadow:0 0 40px #ff1493; margin:15px 0; opacity:0; transition:opacity 1.4s; line-height:1.1;
+    }
+    .long-text { font-size:46px; max-width:92%; margin-top:25px; }
+
+    .card-container { display:none; perspective:1500px; margin:40px 0; }
+    .card {
+      width:520px; height:320px; position:relative; transform-style:preserve-3d;
+      transition:transform 1.8s cubic-bezier(0.68,-0.55,0.27,1.55);
+    }
+    .card.open { transform:rotateY(28deg); }
+
+    .photo-front, .photo-back {
+      position:absolute; width:100%; height:100%; border:8px solid #ff69b4;
+      border-radius:12px; box-shadow:0 0 40px #ff1493; backface-visibility:hidden; object-fit:cover;
+    }
+    .photo-front { transform:rotateY(0deg); }
+    .photo-back { transform:rotateY(180deg); }
+
+    .caption { margin-top:15px; font-size:26px; color:#ffb6c1; opacity:0; transition:opacity 1.2s; }
+    .final-heart { display:none; width:420px; height:380px; position:relative; margin-top:30px; }
+  </style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div class="content">
+  <div id="bigheart" class="heart">❤️</div>
+  <div id="count" class="countdown"></div>
+  
+  <div id="ozurText" class="big-text">ÖZÜR</div>
+  <div id="dilerimText" class="big-text">DİLERİM</div>
+  <div id="longText" class="long-text"> önce seni kırdığım için </div>
+
+  <div id="cardContainer" class="card-container">
+    <div id="card" class="card">
+      <img id="photo1" class="photo-front" src="https://via.placeholder.com/520x320/ff69b4/fff?text=Fotoğraf+1" alt="">
+      <img id="photo2" class="photo-back" src="https://via.placeholder.com/520x320/ff69b4/fff?text=Fotoğraf+2" alt="">
+    </div>
+  </div>
+
+  <p id="caption" class="caption">Kalbimin sahibine... Seni Seviyorum ❤️</p>
+  <div id="finalHeart" class="final-heart"></div>
+</div>
+
+<script>
+// Matrix Yağmuru
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const messages = ["Seni Seviyorum", "❤️", "I Love You", "Seni Seviyorum", "My Love", "❤️"];
+const chars = "01アイウエオ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const fontSize = 18;
+const columns = Math.floor(canvas.width / fontSize);
+const drops = Array(columns).fill(1);
+
+function drawMatrix() {
+  ctx.fillStyle = 'rgba(0,0,0,0.07)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#ff1493';
+  ctx.font = `${fontSize}px Arial`;
+
+  for (let i = 0; i < drops.length; i++) {
+    let text = (Math.random() > 0.82) ? messages[Math.floor(Math.random() * messages.length)] : chars[Math.floor(Math.random() * chars.length)];
+    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+    drops[i]++;
+  }
+}
+setInterval(drawMatrix, 45);
+
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
+// Animasyon
+function startSequence() {
+  const bigheart = document.getElementById('bigheart');
+  const countEl = document.getElementById('count');
+  const ozur = document.getElementById('ozurText');
+  const dilerim = document.getElementById('dilerimText');
+  const longTxt = document.getElementById('longText');
+  const cardContainer = document.getElementById('cardContainer');
+  const card = document.getElementById('card');
+  const caption = document.getElementById('caption');
+  const final = document.getElementById('finalHeart');
+
+  bigheart.style.display = 'block';
+
+  let num = 3;
+  countEl.style.opacity = 1;
+  countEl.textContent = num;
+
+  const countInterval = setInterval(() => {
+    num--;
+    if (num > 0) {
+      countEl.textContent = num;
+    } else {
+      clearInterval(countInterval);
+      countEl.style.opacity = 0;
+
+      setTimeout(() => { ozur.style.opacity = 1; }, 700);
+      setTimeout(() => { dilerim.style.opacity = 1; }, 1700);
+      setTimeout(() => { longTxt.style.opacity = 1; }, 2900);
+
+      setTimeout(() => {
+        cardContainer.style.display = 'block';
+        setTimeout(() => { card.classList.add('open'); }, 500);
+        caption.style.opacity = 1;
+      }, 4800);
+
+      setTimeout(() => {
+        final.style.display = 'block';
+        final.innerHTML = `
+          <div style="position:absolute; inset:0; background:radial-gradient(circle, #ff69b4 30%, #ff1493); border-radius:50%; display:flex; align-items:center; justify-content:center; gap:15px; flex-wrap:wrap; padding:30px; box-shadow:0 0 70px #ff1493;">
+            <img src="${document.getElementById https://ibb.co/b5D7R4fT.src}" style="width:90px;height:90px;border-radius:50%;object-fit:cover;border:4px solid white;">
+            <img src="${document.getElementById https://ibb.co/5hSV4HYZ.src}" style="width:90px;height:90px;border-radius:50%;object-fit:cover;border:4px solid white;">
+            <span style="font-size:90px; filter:drop-shadow(0 0 20px white);">❤️</span>
+          </div>
+        `;
+      }, 7000);
+    }
+  }, 1400);
+}
+
+setTimeout(startSequence, 600);
+</script>
+</body>
+</html>
